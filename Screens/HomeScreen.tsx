@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Animated } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 
@@ -7,6 +7,8 @@ type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation, route }: HomeScreenProps) {
   const [menuItems, setMenuItems] = useState<{ dishName: string, description: string, course: string, price: number }[]>([]);
+  const [boxAnimation] = useState(new Animated.Value(1));
+  const [bgColor, setBgColor] = useState('red');
 
   useEffect(() => {
     if (route.params?.newItem) {
@@ -14,9 +16,37 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
     }
   }, [route.params?.newItem]);
 
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(boxAnimation, {
+          toValue: 1.1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(boxAnimation, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    const bgColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    let colorIndex = 0;
+    const intervalId = setInterval(() => {
+      setBgColor(bgColors[colorIndex]);
+      colorIndex = (colorIndex + 1) % bgColors.length;
+    }, 2500);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Chef's Menu</Text>
+      <Animated.View style={[styles.titleBox, { backgroundColor: bgColor, transform: [{ scale: boxAnimation }] }]}>
+        <Text style={styles.title}>Chef's Menu</Text>
+      </Animated.View>
 
       <Text style={styles.itemCount}>Total Items: {menuItems.length}</Text>
 
@@ -34,10 +64,10 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenu')}>
-          <Text style={styles.buttonText}>Add Menu</Text>
+          <Text style={styles.buttonText}>Add Menu Item</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.buttonFilter} onPress={() => navigation.navigate('FilterMenu')}>
-          <Text style={styles.buttonText}>Filter Menu</Text>
+          <Text style={styles.buttonText}>Filter Search Menu</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -49,11 +79,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'gray',
     padding: 20,
   },
-  title: {
-    fontSize: 24,
+  titleBox: {
+    borderColor: 'blue',
+    borderWidth: 2,
+    padding: 10,
     marginBottom: 20,
+    borderRadius: 10,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'black',
     fontFamily: 'sans-serif',
   },
   itemCount: {
@@ -65,6 +104,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     paddingVertical: 10,
     marginBottom: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 5,
   },
   dishName: {
     fontSize: 20,
