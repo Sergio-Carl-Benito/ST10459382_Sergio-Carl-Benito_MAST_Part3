@@ -7,7 +7,7 @@ import { RootStackParamList } from '../types';
 
 const courses = ['Starters', 'Mains', 'Desserts'];
 
-type AddMenuScreenProps = NativeStackScreenProps<RootStackParamList, 'AddMenu'>;
+type AddMenuScreenProps = NativeStackScreenProps<RootStackParamList, 'AddMenuItem'>;
 
 export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
   const [dishName, setDishName] = useState('');

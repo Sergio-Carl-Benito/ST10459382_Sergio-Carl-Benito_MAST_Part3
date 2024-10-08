@@ -63,7 +63,7 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
       />
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenu')}>
+        <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenuItem')}>
           <Text style={styles.buttonText}>Add Menu Item</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.buttonFilter} onPress={() => navigation.navigate('FilterMenu')}>
