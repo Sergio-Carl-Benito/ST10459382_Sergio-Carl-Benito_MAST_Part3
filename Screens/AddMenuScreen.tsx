@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: 'red',
+    color: 'black',
     textAlign: 'center', 
     marginBottom: 20,   
     fontFamily: 'sans-serif',
