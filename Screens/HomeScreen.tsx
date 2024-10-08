@@ -48,7 +48,9 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
         <Text style={styles.title}>Chef's Menu</Text>
       </Animated.View>
 
-      <Text style={styles.itemCount}>Total Items: {menuItems.length}</Text>
+      <View style={styles.itemCountContainer}>
+        <Text style={styles.itemCount}>Total Items In Menu: {menuItems.length}</Text>
+      </View>
 
       <FlatList
         data={menuItems}
@@ -95,9 +97,17 @@ const styles = StyleSheet.create({
     color: 'black',
     fontFamily: 'sans-serif',
   },
-  itemCount: {
-    fontSize: 18,
+  itemCountContainer: {
+    backgroundColor: 'yellow', 
+    borderRadius: 8,
+    padding: 10,
     marginBottom: 10,
+  },
+  itemCount: {
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    textAlign: 'center',
+    color: 'black',
   },
   menuItem: {
     borderWidth: 1,
@@ -134,14 +144,14 @@ const styles = StyleSheet.create({
     bottom: 20,
   },
   buttonAdd: {
-    backgroundColor: 'green', 
+    backgroundColor: 'green',
     padding: 15,
     borderRadius: 5,
     width: '45%',
     alignItems: 'center',
   },
   buttonFilter: {
-    backgroundColor: 'blue', 
+    backgroundColor: 'blue',
     padding: 15,
     borderRadius: 5,
     width: '45%',
