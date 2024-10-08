@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     fontFamily: 'sans-serif',
-  },
+  }, 
   itemCountContainer: {
     backgroundColor: 'yellow', 
     borderRadius: 8,

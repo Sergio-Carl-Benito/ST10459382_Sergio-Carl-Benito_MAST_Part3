@@ -1,4 +1,3 @@
-// screens/AddMenuScreen.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
@@ -22,6 +21,8 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Welcome Chef,{'\n'}Add a Menu Item</Text>
+      
       <Text style={styles.label}>Dish Name</Text>
       <TextInput
         style={styles.input}
@@ -70,6 +71,14 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'gray',
   },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'red',
+    textAlign: 'center', 
+    marginBottom: 20,   
+    fontFamily: 'sans-serif',
+  },
   label: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -92,14 +101,14 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 10,
     marginBottom: 15,
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   picker: {
     height: 50,
     width: '100%',
     backgroundColor: 'white',
-    textAlign: 'center', 
+    textAlign: 'center',
   },
   button: {
     backgroundColor: 'green',
@@ -115,4 +124,3 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif',
   },
 });
-
