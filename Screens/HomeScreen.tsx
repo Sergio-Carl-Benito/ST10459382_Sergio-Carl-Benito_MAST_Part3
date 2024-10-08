@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
   itemCount: {
     fontSize: 18,
     marginBottom: 10,
-    fontFamily: 'sans-serif',
   },
   menuItem: {
     borderWidth: 1,
@@ -114,21 +113,18 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 6,
-    elevation: 3, 
+    elevation: 3,
   },
   dishName: {
     fontSize: 20,
     fontWeight: 'bold',
-    fontFamily: 'sans-serif',
   },
   description: {
     fontSize: 16,
-    fontFamily: 'sans-serif',
   },
   price: {
     fontSize: 16,
-    fontFamily: 'sans-serif',
-    fontWeight: 'bold', 
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -138,14 +134,14 @@ const styles = StyleSheet.create({
     bottom: 20,
   },
   buttonAdd: {
-    backgroundColor: 'green',
+    backgroundColor: 'green', 
     padding: 15,
     borderRadius: 5,
     width: '45%',
     alignItems: 'center',
   },
   buttonFilter: {
-    backgroundColor: 'blue',
+    backgroundColor: 'blue', 
     padding: 15,
     borderRadius: 5,
     width: '45%',
@@ -154,6 +150,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 16,
-    fontFamily: 'sans-serif',
   },
 });
