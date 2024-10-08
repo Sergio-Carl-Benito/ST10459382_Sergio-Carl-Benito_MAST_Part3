@@ -1,71 +1,77 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Animated } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 
-const courses = ['Starters', 'Mains', 'Desserts'];
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-type AddMenuScreenProps = NativeStackScreenProps<RootStackParamList, 'AddMenuItem'>;
+export default function HomeScreen({ navigation, route }: HomeScreenProps) {
+  const [menuItems, setMenuItems] = useState<{ dishName: string, description: string, course: string, price: number }[]>([]);
+  const [boxAnimation] = useState(new Animated.Value(1));
+  const [bgColor, setBgColor] = useState('red');
 
-export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
-  const [dishName, setDishName] = useState('');
-  const [description, setDescription] = useState('');
-  const [course, setCourse] = useState(courses[0]);
-  const [price, setPrice] = useState('');
+  useEffect(() => {
+    if (route.params?.newItem) {
+      setMenuItems((prevItems) => [...prevItems, route.params.newItem as { dishName: string; description: string; course: string; price: number }]);
+    }
+  }, [route.params?.newItem]);
 
-  const handleSubmit = () => {
-    const newItem = { dishName, description, course, price: parseFloat(price) };
-    navigation.navigate('Home', { newItem });
-  };
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(boxAnimation, {
+          toValue: 1.1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(boxAnimation, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    const bgColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+    let colorIndex = 0;
+    const intervalId = setInterval(() => {
+      setBgColor(bgColors[colorIndex]);
+      colorIndex = (colorIndex + 1) % bgColors.length;
+    }, 2500);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Chef,{'\n'}Add a Menu Item</Text>
+      <Animated.View style={[styles.titleBox, { backgroundColor: bgColor, transform: [{ scale: boxAnimation }] }]}>
+        <Text style={styles.title}>Chef's Menu</Text>
+      </Animated.View>
 
-      <Image 
-        source={require('../assets/logo.png')}
-        style={styles.image}
-      />
-    
-      <Text style={styles.label}>Dish Name</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setDishName}
-        value={dishName}
-      />
-
-      <Text style={styles.label}>Describe Dish</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setDescription}
-        value={description}
-      />
-
-      <Text style={styles.label}>What is the price of the dish?</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={setPrice}
-        value={price}
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Select the course</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={course}
-          onValueChange={setCourse}
-          style={styles.picker}
-        >
-          {courses.map((course) => (
-            <Picker.Item key={course} label={course} value={course} />
-          ))}
-        </Picker>
+      <View style={styles.itemCountContainer}>
+        <Text style={styles.itemCount}>Total Items In Menu: {menuItems.length}</Text>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Add Dish to Menu</Text>
-      </TouchableOpacity>
+      <FlatList
+        data={menuItems}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
+            <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
+            <Text style={styles.description}>{item.description}</Text>
+            <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+          </TouchableOpacity>
+        )}
+      />
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenuItem')}>
+          <Text style={styles.buttonText}>Add Menu Item</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.buttonFilter} onPress={() => navigation.navigate('FilterMenu')}>
+          <Text style={styles.buttonText}>Filter Search Menu</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -73,64 +79,86 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: 'gray',
+    padding: 20,
+  },
+  titleBox: {
+    borderColor: 'blue',
+    borderWidth: 2,
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 10,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: 'black',
-    textAlign: 'center',
-    marginBottom: 20,
     fontFamily: 'sans-serif',
   },
-  image: {
-    width: 100,  
-    height: 100, 
-    alignSelf: 'center', 
+  itemCountContainer: {
+    backgroundColor: 'yellow',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
   },
-  label: {
+  itemCount: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: 'black',
+  },
+  menuItem: {
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  dishName: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-    fontFamily: 'sans-serif',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: 'white',
-    marginBottom: 15,
+  description: {
+    fontSize: 16,
   },
-  pickerContainer: {
-    borderWidth: 3,
-    borderColor: 'gray',
-    borderRadius: 5,
-    paddingBottom: 10,
-    paddingTop: 10,
-    marginBottom: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
+  price: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  picker: {
-    height: 50,
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     width: '100%',
-    backgroundColor: 'white',
-    textAlign: 'center',
+    position: 'absolute',
+    bottom: 20,
   },
-  button: {
+  buttonAdd: {
     backgroundColor: 'green',
-    paddingVertical: 15,
+    padding: 15,
     borderRadius: 5,
+    width: '45%',
     alignItems: 'center',
-    marginTop: 30,
+  },
+  buttonFilter: {
+    backgroundColor: 'blue',
+    padding: 15,
+    borderRadius: 5,
+    width: '45%',
+    alignItems: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    fontFamily: 'sans-serif',
+    fontSize: 16,
   },
 });

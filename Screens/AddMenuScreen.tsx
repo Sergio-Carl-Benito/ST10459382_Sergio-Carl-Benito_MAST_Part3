@@ -22,7 +22,7 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Chef,{'\n'}Add a Menu Item</Text>
-      
+
       <Text style={styles.label}>Dish Name</Text>
       <TextInput
         style={styles.input}
@@ -75,8 +75,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: 'black',
-    textAlign: 'center', 
-    marginBottom: 20,   
+    textAlign: 'center',
+    marginBottom: 20,
     fontFamily: 'sans-serif',
   },
   label: {
