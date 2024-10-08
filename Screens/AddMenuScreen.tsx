@@ -29,14 +29,14 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
         value={dishName}
       />
 
-      <Text style={styles.label}>Description</Text>
+      <Text style={styles.label}>Describe Dish</Text>
       <TextInput
         style={styles.input}
         onChangeText={setDescription}
         value={description}
       />
 
-      <Text style={styles.label}>Price</Text>
+      <Text style={styles.label}>What is the price of the dish?</Text>
       <TextInput
         style={styles.input}
         onChangeText={setPrice}
@@ -44,7 +44,7 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Course</Text>
+      <Text style={styles.label}>Select the course</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={course}
@@ -58,7 +58,7 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Add Dish</Text>
+        <Text style={styles.buttonText}>Add Dish to Menu</Text>
       </TouchableOpacity>
     </View>
   );
@@ -68,13 +68,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'gray',
   },
   label: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    fontFamily: 'sans-serif',
   },
   input: {
     borderWidth: 1,
@@ -85,23 +86,23 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   pickerContainer: {
-    borderWidth: 1.5,
+    borderWidth: 3,
     borderColor: 'gray',
     borderRadius: 5,
-    paddingBottom: 10, 
-    paddingTop: 10, 
+    paddingBottom: 10,
+    paddingTop: 10,
     marginBottom: 15,
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
-  
   picker: {
     height: 50,
     width: '100%',
-    paddingHorizontal: 10, 
     backgroundColor: 'white',
+    textAlign: 'center', 
   },
-  
   button: {
-    backgroundColor: 'blue',
+    backgroundColor: 'green',
     paddingVertical: 15,
     borderRadius: 5,
     alignItems: 'center',
@@ -111,5 +112,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'sans-serif',
   },
 });
+
