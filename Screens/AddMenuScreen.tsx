@@ -1,6 +1,6 @@
 // screens/AddMenuScreen.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
@@ -22,20 +22,21 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Dish Name:</Text>
-      <TextInput style={styles.input} onChangeText={setDishName} value={dishName} />
+      <Text style={styles.label}>Dish Name</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setDishName}
+        value={dishName}
+      />
 
-      <Text style={styles.label}>Description:</Text>
-      <TextInput style={styles.input} onChangeText={setDescription} value={description} />
+      <Text style={styles.label}>Description</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={setDescription}
+        value={description}
+      />
 
-      <Text style={styles.label}>Course:</Text>
-      <Picker selectedValue={course} onValueChange={setCourse}>
-        {courses.map((course) => (
-          <Picker.Item key={course} label={course} value={course} />
-        ))}
-      </Picker>
-
-      <Text style={styles.label}>Price:</Text>
+      <Text style={styles.label}>Price</Text>
       <TextInput
         style={styles.input}
         onChangeText={setPrice}
@@ -43,7 +44,22 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
         keyboardType="numeric"
       />
 
-      <Button title="Add Dish" onPress={handleSubmit} />
+      <Text style={styles.label}>Course</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={course}
+          onValueChange={setCourse}
+          style={styles.picker}
+        >
+          {courses.map((course) => (
+            <Picker.Item key={course} label={course} value={course} />
+          ))}
+        </Picker>
+      </View>
+
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Add Dish</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -52,15 +68,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: 'white',
   },
   label: {
-    fontSize: 18,
-    marginVertical: 8,
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   input: {
     borderWidth: 1,
-    padding: 8,
+    borderColor: 'gray',
+    padding: 10,
     borderRadius: 5,
-    marginBottom: 10,
+    backgroundColor: 'white',
+    marginBottom: 15,
+  },
+  pickerContainer: {
+    borderWidth: 1.5,
+    borderColor: 'gray',
+    borderRadius: 5,
+    paddingBottom: 10, 
+    paddingTop: 10, 
+    marginBottom: 15,
+  },
+  
+  picker: {
+    height: 50,
+    width: '100%',
+    paddingHorizontal: 10, 
+    backgroundColor: 'white',
+  },
+  
+  button: {
+    backgroundColor: 'blue',
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
