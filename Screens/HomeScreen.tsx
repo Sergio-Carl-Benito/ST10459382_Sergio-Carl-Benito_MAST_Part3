@@ -54,11 +54,11 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
         data={menuItems}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.menuItem}>
+          <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
             <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
             <Text style={styles.description}>{item.description}</Text>
             <Text style={styles.price}>${item.price.toFixed(2)}</Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
@@ -101,11 +101,20 @@ const styles = StyleSheet.create({
     fontFamily: 'sans-serif',
   },
   menuItem: {
-    borderBottomWidth: 1,
-    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'lightgray',
+    borderRadius: 8,
+    padding: 15,
     marginBottom: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3, 
   },
   dishName: {
     fontSize: 20,
@@ -119,6 +128,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontFamily: 'sans-serif',
+    fontWeight: 'bold', 
   },
   buttonContainer: {
     flexDirection: 'row',
