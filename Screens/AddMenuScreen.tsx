@@ -1,42 +1,58 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
+import { useMenu } from './MenuContext';
 
 const courses = ['Starters', 'Mains', 'Desserts'];
 
-type AddMenuScreenProps = NativeStackScreenProps<RootStackParamList, 'AddMenuItem'>;
-
-export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
+export default function AddMenuScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'AddMenuItem'>) {
+  const { menuItems, addMenuItem, removeMenuItem } = useMenu();
   const [dishName, setDishName] = useState('');
   const [description, setDescription] = useState('');
   const [course, setCourse] = useState(courses[0]);
   const [price, setPrice] = useState('');
+  const [selectedItemToRemove, setSelectedItemToRemove] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    const newItem = { dishName, description, course, price: parseFloat(price) };
-    navigation.navigate('Home', { newItem });
+    if (!dishName || !description || !price) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+      Alert.alert('Error', 'Please enter a valid price');
+      return;
+    }
+
+    addMenuItem({ dishName, description, course, price: parseFloat(price) });
+    navigation.goBack();
+  };
+
+  const handleRemoveItem = () => {
+    if (selectedItemToRemove) {
+      removeMenuItem(selectedItemToRemove);
+      setSelectedItemToRemove(null);
+    }
   };
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Chef,{'\n'}Add a Menu Item</Text>
-
       <Text style={styles.label}>Dish Name</Text>
       <TextInput
         style={styles.input}
         onChangeText={setDishName}
         value={dishName}
       />
-
       <Text style={styles.label}>Describe Dish</Text>
       <TextInput
         style={styles.input}
         onChangeText={setDescription}
         value={description}
       />
-
       <Text style={styles.label}>What is the price of the dish?</Text>
       <TextInput
         style={styles.input}
@@ -44,7 +60,6 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
         value={price}
         keyboardType="numeric"
       />
-
       <Text style={styles.label}>Select the course</Text>
       <View style={styles.pickerContainer}>
         <Picker
@@ -58,14 +73,50 @@ export default function AddMenuScreen({ navigation }: AddMenuScreenProps) {
         </Picker>
       </View>
 
+      <Text style={styles.label}>Select Item to Remove</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={selectedItemToRemove}
+          onValueChange={(itemValue) => setSelectedItemToRemove(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Select an item" value={null} />
+          {menuItems.map((item) => (
+            <Picker.Item 
+              key={item.id} 
+              label={`${item.dishName} - ${item.course}`} 
+              value={item.id} 
+            />
+          ))}
+        </Picker>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Add Dish to Menu</Text>
       </TouchableOpacity>
+      <TouchableOpacity 
+        style={styles.removeButton} 
+        onPress={handleRemoveItem}
+        disabled={!selectedItemToRemove}
+      >
+        <Text style={styles.buttonText}>Remove Selected Item</Text>
+      </TouchableOpacity>
+
+      
     </View>
+    </ScrollView>
   );
 }
 
+
 const styles = StyleSheet.create({
+
+  removeButton: {
+    backgroundColor: 'red',
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 15,
+  },
   container: {
     flex: 1,
     padding: 20,

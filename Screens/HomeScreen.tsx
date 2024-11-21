@@ -2,11 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Button, FlatList, StyleSheet, Animated, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
+import { useMenu } from './MenuContext';
 
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
-
-export default function HomeScreen({ navigation, route }: HomeScreenProps) {
-  const [menuItems, setMenuItems] = useState<{ dishName: string; description: string; course: string; price: number }[]>([]);
+export default function HomeScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) {
+  const { menuItems, removeMenuItem } = useMenu();
 
   const {
     groupedItems,
@@ -52,25 +51,8 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
     };
   }, [menuItems]);
 
-  const removeItem = (index: number) => {
-    Alert.alert(
-      "Remove Item",
-      "Are you sure you want to remove this item?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "OK", onPress: () => setMenuItems(menuItems.filter((_, i) => i !== index)) }
-      ]
-    );
-  };
-
   const [boxAnimation] = useState(new Animated.Value(1));
   const [bgColor, setBgColor] = useState('red');
-
-  useEffect(() => {
-    if (route.params?.newItem) {
-      setMenuItems((prevItems) => [...prevItems, route.params.newItem as { dishName: string; description: string; course: string; price: number }]);
-    }
-  }, [route.params?.newItem]);
 
   useEffect(() => {
     Animated.loop(
@@ -106,6 +88,17 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
     { label: 'Average Price for Desserts Only: R', value: avgPriceDesserts.toFixed(2) },
   ];
 
+  const handleRemoveItem = (id: string) => {
+    Alert.alert(
+      "Remove Item",
+      "Are you sure you want to remove this item?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "OK", onPress: () => removeMenuItem(id) }
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.titleBox, { backgroundColor: bgColor, transform: [{ scale: boxAnimation }] }]}>
@@ -113,23 +106,22 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
       </Animated.View>
 
       <View style={styles.averagePrices}>
-  {priceDetails.map((item, index) => (
-    <Text key={index} style={styles.totalItems}>
-      {item.label} {item.value}
-    </Text>
-  ))}
-</View>
-
+        {priceDetails.map((item, index) => (
+          <Text key={index} style={styles.totalItems}>
+            {item.label} {item.value}
+          </Text>
+        ))}
+      </View>
 
       <FlatList
         data={menuItems}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
           <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
             <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
             <Text style={styles.description}>{item.description}</Text>
             <Text style={styles.price}>R {item.price.toFixed(2)}</Text>
-            <Button title="Remove" color="red" onPress={() => removeItem(index)} />
+            <Button title="Remove" color="red" onPress={() => handleRemoveItem(item.id)} />
           </TouchableOpacity>
         )}
       />
@@ -138,11 +130,12 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
         <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenuItem')}>
           <Text style={styles.buttonText}>Add Menu Item</Text>
         </TouchableOpacity>
-        <Button title="Filter Menu" onPress={() => navigation.navigate('FilterMenu', { menuItems })} />
+        <Button title="Filter Menu" onPress={() => navigation.navigate('FilterMenu')} />
       </View>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
