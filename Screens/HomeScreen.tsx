@@ -1,37 +1,57 @@
-import React, { useState, useEffect, } from 'react';
-import { View, Text, TouchableOpacity, Button,  FlatList, StyleSheet, Animated,Alert, ScrollView } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, TouchableOpacity, Button, FlatList, StyleSheet, Animated, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
-
-
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation, route }: HomeScreenProps) {
-
-
-
-
   const [menuItems, setMenuItems] = useState<{ dishName: string; description: string; course: string; price: number }[]>([]);
 
-// Separate items by course
-const starters = menuItems.filter((item) => item.course === 'Starters');
-const mains = menuItems.filter((item) => item.course === 'Mains');
-const desserts = menuItems.filter((item) => item.course === 'Desserts');
+  const {
+    groupedItems,
+    averagePrices,
+    starters,
+    mains,
+    desserts,
+    avgPriceAll,
+    avgPriceStarters,
+    avgPriceMains,
+    avgPriceDesserts,
+  } = useMemo(() => {
+    const groupedItems = menuItems.reduce((groups, item) => {
+      if (!groups[item.course]) {
+        groups[item.course] = [];
+      }
+      groups[item.course].push(item);
+      return groups;
+    }, {} as Record<string, typeof menuItems>);
 
-// Calculate average prices
-const calculateAveragePrice = (items: typeof menuItems) =>
-  items.length > 0 ? items.reduce((sum, item) => sum + item.price, 0) / items.length : 0;
+    const calculateAveragePrice = (items: typeof menuItems) =>
+      items?.length > 0 ? items.reduce((sum, item) => sum + item.price, 0) / items.length : 0;
 
-const averagePriceOverall = calculateAveragePrice(menuItems);
-const averagePriceStarters = calculateAveragePrice(starters);
-const averagePriceMains = calculateAveragePrice(mains);
-const averagePriceDesserts = calculateAveragePrice(desserts);
+    const averagePrices: Record<string, number> = {};
+    for (const [course, items] of Object.entries(groupedItems)) {
+      averagePrices[course] = calculateAveragePrice(items);
+    }
 
+    const starters = groupedItems['Starters'] || [];
+    const mains = groupedItems['Mains'] || [];
+    const desserts = groupedItems['Desserts'] || [];
 
+    return {
+      groupedItems,
+      averagePrices,
+      starters,
+      mains,
+      desserts,
+      avgPriceAll: calculateAveragePrice(menuItems),
+      avgPriceStarters: averagePrices['Starters'] || 0,
+      avgPriceMains: averagePrices['Mains'] || 0,
+      avgPriceDesserts: averagePrices['Desserts'] || 0,
+    };
+  }, [menuItems]);
 
-
-  // Handle removal of a menu item
   const removeItem = (index: number) => {
     Alert.alert(
       "Remove Item",
@@ -42,7 +62,7 @@ const averagePriceDesserts = calculateAveragePrice(desserts);
       ]
     );
   };
-  
+
   const [boxAnimation] = useState(new Animated.Value(1));
   const [bgColor, setBgColor] = useState('red');
 
@@ -78,28 +98,37 @@ const averagePriceDesserts = calculateAveragePrice(desserts);
     return () => clearInterval(intervalId);
   }, []);
 
+  const priceDetails = [
+    { label: 'Total Items in Menu:', value: menuItems.length },
+    { label: 'Average Price of All Menu items: R', value: avgPriceAll.toFixed(2) },
+    { label: 'Average Price for Starters Only: R', value: avgPriceStarters.toFixed(2) },
+    { label: 'Average Price for Mains Only: R', value: avgPriceMains.toFixed(2) },
+    { label: 'Average Price for Desserts Only: R', value: avgPriceDesserts.toFixed(2) },
+  ];
+
   return (
-    <ScrollView>
     <View style={styles.container}>
       <Animated.View style={[styles.titleBox, { backgroundColor: bgColor, transform: [{ scale: boxAnimation }] }]}>
         <Text style={styles.title}>Chef's Menu</Text>
       </Animated.View>
 
-      <Text style={styles.totalItems}>Total Items: {menuItems.length}</Text>
-      <Text style={styles.averagePrice}>Average Price: ${averagePriceOverall.toFixed(2)}</Text>
-      <Text style={styles.averagePrice}>Average Price for starters: ${averagePriceStarters.toFixed(2)}</Text>
-      <Text style={styles.averagePrice}>Average Price for mains : ${averagePriceMains.toFixed(2)}</Text>
-      <Text style={styles.averagePrice}>Average Price for deserts: ${averagePriceDesserts.toFixed(2)}</Text>
+      <View style={styles.averagePrices}>
+  {priceDetails.map((item, index) => (
+    <Text key={index} style={styles.totalItems}>
+      {item.label} {item.value}
+    </Text>
+  ))}
+</View>
+
 
       <FlatList
         data={menuItems}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item, index }) => (
           <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
-                        <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
-            
+            <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
             <Text style={styles.description}>{item.description}</Text>
-            <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+            <Text style={styles.price}>R {item.price.toFixed(2)}</Text>
             <Button title="Remove" color="red" onPress={() => removeItem(index)} />
           </TouchableOpacity>
         )}
@@ -112,78 +141,65 @@ const averagePriceDesserts = calculateAveragePrice(desserts);
         <Button title="Filter Menu" onPress={() => navigation.navigate('FilterMenu', { menuItems })} />
       </View>
     </View>
-    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'gray',
+    backgroundColor: '#f4f4f4',
     padding: 20,
   },
   totalItems: {
     fontSize: 18,
     marginTop: 10,
-  },
-  averagePrice: {
-    fontSize: 18,
-    marginBottom: 20,
+    color: '#333',
   },
   titleBox: {
-    borderColor: 'blue',
+    borderColor: '#4CAF50',
     borderWidth: 2,
     padding: 10,
     marginBottom: 20,
     borderRadius: 10,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: 'black',
-    fontFamily: 'sans-serif',
-  },
-  itemCountContainer: {
-    backgroundColor: 'yellow',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  itemCount: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: 'black',
+    color: '#ffffff',
   },
   menuItem: {
     borderWidth: 1,
-    borderColor: 'lightgray',
+    borderColor: '#ddd',
     borderRadius: 8,
     padding: 15,
     marginBottom: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#ffffff',
     width: '100%',
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
     elevation: 3,
   },
   dishName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#333',
   },
   description: {
     fontSize: 16,
+    color: '#555',
   },
   price: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#E91E63',
+  },
+  averagePrices: {
+    marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -193,14 +209,7 @@ const styles = StyleSheet.create({
     bottom: 20,
   },
   buttonAdd: {
-    backgroundColor: 'green',
-    padding: 15,
-    borderRadius: 5,
-    width: '45%',
-    alignItems: 'center',
-  },
-  buttonFilter: {
-    backgroundColor: 'blue',
+    backgroundColor: '#4CAF50',
     padding: 15,
     borderRadius: 5,
     width: '45%',
