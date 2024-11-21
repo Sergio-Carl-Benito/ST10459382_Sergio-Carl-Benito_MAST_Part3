@@ -4,9 +4,12 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
 import { useMenu } from './MenuContext';
 
+// Main component for HomeScreen
 export default function HomeScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Home'>) {
+  // Destructure the menuItems and removeMenuItem from MenuContext
   const { menuItems, removeMenuItem } = useMenu();
 
+  // useMemo to group menu items by course and calculate average prices
   const {
     groupedItems,
     averagePrices,
@@ -18,6 +21,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
     avgPriceMains,
     avgPriceDesserts,
   } = useMemo(() => {
+    // Group items by their course (Starters, Mains, Desserts)
     const groupedItems = menuItems.reduce((groups, item) => {
       if (!groups[item.course]) {
         groups[item.course] = [];
@@ -26,18 +30,22 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
       return groups;
     }, {} as Record<string, typeof menuItems>);
 
+    // Function to calculate the average price of items
     const calculateAveragePrice = (items: typeof menuItems) =>
       items?.length > 0 ? items.reduce((sum, item) => sum + item.price, 0) / items.length : 0;
 
+    // Create an object to store average prices for each course
     const averagePrices: Record<string, number> = {};
     for (const [course, items] of Object.entries(groupedItems)) {
       averagePrices[course] = calculateAveragePrice(items);
     }
 
+    // Destructure grouped items into individual categories
     const starters = groupedItems['Starters'] || [];
     const mains = groupedItems['Mains'] || [];
     const desserts = groupedItems['Desserts'] || [];
 
+    // Return all the data, including average prices
     return {
       groupedItems,
       averagePrices,
@@ -49,12 +57,15 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
       avgPriceMains: averagePrices['Mains'] || 0,
       avgPriceDesserts: averagePrices['Desserts'] || 0,
     };
-  }, [menuItems]);
+  }, [menuItems]);  // Recalculate whenever menuItems changes
 
-  const [boxAnimation] = useState(new Animated.Value(1));
-  const [bgColor, setBgColor] = useState('red');
+  // State for animations (for scaling effect) and background color
+  const [boxAnimation] = useState(new Animated.Value(1));  // Start with scale 1
+  const [bgColor, setBgColor] = useState('red');  // Initial background color
 
+  // useEffect to handle animations and periodic background color changes
   useEffect(() => {
+    // Animation loop to scale the box size back and forth
     Animated.loop(
       Animated.sequence([
         Animated.timing(boxAnimation, {
@@ -70,6 +81,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
       ])
     ).start();
 
+    // Change the background color every 2.5 seconds from a predefined array
     const bgColors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
     let colorIndex = 0;
     const intervalId = setInterval(() => {
@@ -77,9 +89,11 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
       colorIndex = (colorIndex + 1) % bgColors.length;
     }, 2500);
 
+    // Clean up the interval when the component unmounts
     return () => clearInterval(intervalId);
-  }, []);
+  }, []);  // Empty dependency array means this runs once when the component mounts
 
+  // Price details array to display total items and average prices
   const priceDetails = [
     { label: 'Total Items in Menu:', value: menuItems.length },
     { label: 'Average Price of All Menu items: R', value: avgPriceAll.toFixed(2) },
@@ -88,6 +102,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
     { label: 'Average Price for Desserts Only: R', value: avgPriceDesserts.toFixed(2) },
   ];
 
+  // Handle removing a menu item (with a confirmation alert)
   const handleRemoveItem = (id: string) => {
     Alert.alert(
       "Remove Item",
@@ -99,12 +114,15 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
     );
   };
 
+  // Render the UI for the HomeScreen
   return (
     <View style={styles.container}>
+      {/* Animated title box with changing background color */}
       <Animated.View style={[styles.titleBox, { backgroundColor: bgColor, transform: [{ scale: boxAnimation }] }]}>
         <Text style={styles.title}>Chef's Menu</Text>
       </Animated.View>
 
+      {/* Display the average prices and total items */}
       <View style={styles.averagePrices}>
         {priceDetails.map((item, index) => (
           <Text key={index} style={styles.totalItems}>
@@ -113,6 +131,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
         ))}
       </View>
 
+      {/* FlatList to display all menu items */}
       <FlatList
         data={menuItems}
         keyExtractor={(item) => item.id}
@@ -126,6 +145,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
         )}
       />
 
+      {/* Button to add a menu item and filter the menu */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenuItem')}>
           <Text style={styles.buttonText}>Add Menu Item</Text>
@@ -136,7 +156,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
   );
 }
 
-
+// Styles for the components
 const styles = StyleSheet.create({
   container: {
     flex: 1,

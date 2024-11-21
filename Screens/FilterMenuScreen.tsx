@@ -5,26 +5,28 @@ import { RootStackParamList } from '../types';
 import { useMenu } from './MenuContext';
 
 export default function FilterMenuScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'FilterMenu'>) {
-  // Get menu items from global context
+  // Access menu items from global context (MenuContext)
   const { menuItems } = useMenu();
   
-  // State to manage filtered items, initially shows all items
+  // State to store the filtered items (initially shows all items)
   const [filteredItems, setFilteredItems] = useState(menuItems);
 
-  // Function to filter menu items by course type
+  // Function to filter menu items by course type (e.g., Starters, Mains, Desserts)
   const filterByCourse = (course: string) => {
     setFilteredItems(menuItems.filter(item => item.course === course));
   };
 
-  // Function to reset filter and show all items
+  // Function to reset the filter and show all items
   const clearFilter = () => {
     setFilteredItems(menuItems);
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Title section */}
       <Text style={styles.title}>Filter Menu</Text>
 
+      {/* Button to navigate back to the Home screen */}
       <TouchableOpacity 
         style={styles.homeButton} 
         onPress={() => navigation.navigate('Home')}
@@ -32,6 +34,7 @@ export default function FilterMenuScreen({ navigation }: NativeStackScreenProps<
         <Text style={styles.homeButtonText}>Back to Home</Text>
       </TouchableOpacity>
 
+      {/* Filter buttons for each course category */}
       <View style={styles.filterButtonContainer}>
         <TouchableOpacity 
           style={[styles.filterButton, styles.startersButton]} 
@@ -54,6 +57,7 @@ export default function FilterMenuScreen({ navigation }: NativeStackScreenProps<
           <Text style={styles.filterButtonText}>Desserts</Text>
         </TouchableOpacity>
         
+        {/* Button to clear the filter and show all items */}
         <TouchableOpacity 
           style={styles.clearFilterButton} 
           onPress={clearFilter}
@@ -62,12 +66,12 @@ export default function FilterMenuScreen({ navigation }: NativeStackScreenProps<
         </TouchableOpacity>
       </View>
 
-      {/* List of menu items */}
+      {/* List of filtered menu items */}
       <FlatList
-        data={filteredItems}
-        keyExtractor={(item) => item.id}
+        data={filteredItems}  // Display the filtered items
+        keyExtractor={(item) => item.id}  // Unique key for each item
         ListEmptyComponent={() => (
-          <Text style={styles.emptyListText}>No items in this category</Text>
+          <Text style={styles.emptyListText}>No items in this category</Text>  // Show message if no items match filter
         )}
         renderItem={({ item }) => (
           <View style={styles.menuItem}>
@@ -84,7 +88,7 @@ export default function FilterMenuScreen({ navigation }: NativeStackScreenProps<
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#f4f4f4',  
     paddingHorizontal: 20,
   },
   title: {
@@ -92,10 +96,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 20,
-    color: '#333',
+    color: '#333',  
   },
   homeButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50',  
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -112,10 +116,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   filterButtonContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row',  
     justifyContent: 'space-between',
     marginBottom: 20,
-    gap: 10, // Added gap between buttons
+    gap: 10,  
   },
   filterButton: {
     flex: 1,
@@ -129,13 +133,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   startersButton: {
-    backgroundColor: '#3498db', // Bright blue
+    backgroundColor: '#3498db',  
   },
   mainsButton: {
-    backgroundColor: '#e74c3c', // Vibrant red
+    backgroundColor: '#e74c3c',  
   },
   dessertsButton: {
-    backgroundColor: '#2ecc71', // Soft green
+    backgroundColor: '#2ecc71',  
   },
   filterButtonText: {
     color: 'white',
@@ -143,7 +147,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   clearFilterButton: {
-    backgroundColor: '#9b59b6', // Purple
+    backgroundColor: '#9b59b6',  
     paddingVertical: 15,
     borderRadius: 8,
     flex: 1,
@@ -184,12 +188,12 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#4CAF50',
+    color: '#4CAF50',  
   },
   emptyListText: {
     textAlign: 'center',
     marginTop: 50,
     fontSize: 18,
-    color: '#888',
+    color: '#888',  
   },
 });
