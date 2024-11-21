@@ -130,7 +130,7 @@ export default function HomeScreen({ navigation }: NativeStackScreenProps<RootSt
         <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenuItem')}>
           <Text style={styles.buttonText}>Add Menu Item</Text>
         </TouchableOpacity>
-        <Button title="Filter Menu" onPress={() => navigation.navigate('FilterMenu')} />
+        <Button title="Filter Menu" onPress={() => navigation.navigate('FilterMenu', { menuItems })} />
       </View>
     </View>
   );
