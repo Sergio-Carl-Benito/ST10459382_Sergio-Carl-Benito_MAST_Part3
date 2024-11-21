@@ -12,7 +12,7 @@
     "@react-native-picker/picker": "^2.7.5",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
-    "expo": "~51.0.28",
+    "expo": "^52.0.9",
     "expo-status-bar": "~1.12.1",
     "install": "^0.13.0",
     "npm": "^10.8.3",

@@ -1,12 +1,48 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Animated } from 'react-native';
+import React, { useState, useEffect, } from 'react';
+import { View, Text, TouchableOpacity, Button,  FlatList, StyleSheet, Animated,Alert, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types';
+
+
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation, route }: HomeScreenProps) {
-  const [menuItems, setMenuItems] = useState<{ dishName: string, description: string, course: string, price: number }[]>([]);
+
+
+
+
+  const [menuItems, setMenuItems] = useState<{ dishName: string; description: string; course: string; price: number }[]>([]);
+
+// Separate items by course
+const starters = menuItems.filter((item) => item.course === 'Starters');
+const mains = menuItems.filter((item) => item.course === 'Mains');
+const desserts = menuItems.filter((item) => item.course === 'Desserts');
+
+// Calculate average prices
+const calculateAveragePrice = (items: typeof menuItems) =>
+  items.length > 0 ? items.reduce((sum, item) => sum + item.price, 0) / items.length : 0;
+
+const averagePriceOverall = calculateAveragePrice(menuItems);
+const averagePriceStarters = calculateAveragePrice(starters);
+const averagePriceMains = calculateAveragePrice(mains);
+const averagePriceDesserts = calculateAveragePrice(desserts);
+
+
+
+
+  // Handle removal of a menu item
+  const removeItem = (index: number) => {
+    Alert.alert(
+      "Remove Item",
+      "Are you sure you want to remove this item?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "OK", onPress: () => setMenuItems(menuItems.filter((_, i) => i !== index)) }
+      ]
+    );
+  };
+  
   const [boxAnimation] = useState(new Animated.Value(1));
   const [bgColor, setBgColor] = useState('red');
 
@@ -43,23 +79,28 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
   }, []);
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       <Animated.View style={[styles.titleBox, { backgroundColor: bgColor, transform: [{ scale: boxAnimation }] }]}>
         <Text style={styles.title}>Chef's Menu</Text>
       </Animated.View>
 
-      <View style={styles.itemCountContainer}>
-        <Text style={styles.itemCount}>Total Items In Menu: {menuItems.length}</Text>
-      </View>
+      <Text style={styles.totalItems}>Total Items: {menuItems.length}</Text>
+      <Text style={styles.averagePrice}>Average Price: ${averagePriceOverall.toFixed(2)}</Text>
+      <Text style={styles.averagePrice}>Average Price for starters: ${averagePriceStarters.toFixed(2)}</Text>
+      <Text style={styles.averagePrice}>Average Price for mains : ${averagePriceMains.toFixed(2)}</Text>
+      <Text style={styles.averagePrice}>Average Price for deserts: ${averagePriceDesserts.toFixed(2)}</Text>
 
       <FlatList
         data={menuItems}
         keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <TouchableOpacity style={styles.menuItem} activeOpacity={0.8}>
-            <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
+                        <Text style={styles.dishName}>{item.dishName} - {item.course}</Text>
+            
             <Text style={styles.description}>{item.description}</Text>
             <Text style={styles.price}>${item.price.toFixed(2)}</Text>
+            <Button title="Remove" color="red" onPress={() => removeItem(index)} />
           </TouchableOpacity>
         )}
       />
@@ -68,11 +109,10 @@ export default function HomeScreen({ navigation, route }: HomeScreenProps) {
         <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddMenuItem')}>
           <Text style={styles.buttonText}>Add Menu Item</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonFilter} onPress={() => navigation.navigate('FilterMenu')}>
-          <Text style={styles.buttonText}>Filter Search Menu</Text>
-        </TouchableOpacity>
+        <Button title="Filter Menu" onPress={() => navigation.navigate('FilterMenu', { menuItems })} />
       </View>
     </View>
+    </ScrollView>
   );
 }
 
@@ -83,6 +123,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'gray',
     padding: 20,
+  },
+  totalItems: {
+    fontSize: 18,
+    marginTop: 10,
+  },
+  averagePrice: {
+    fontSize: 18,
+    marginBottom: 20,
   },
   titleBox: {
     borderColor: 'blue',
@@ -116,6 +164,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    width: '100%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -126,7 +175,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   dishName: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   description: {
