@@ -1,6 +1,6 @@
-No feedback was necessary to implement as I got 100% on part 2. 
+No feedback was necessary to implement as I got 100% on part 2, However, here is a changelog of all general changes made for part 3 as well as styling and refactoring changes.
  
-LINK TO YT VIDEO:  
+LINK TO YT VIDEO:  https://youtu.be/XTLRAtUxvAM
  
 Changelog 
 
